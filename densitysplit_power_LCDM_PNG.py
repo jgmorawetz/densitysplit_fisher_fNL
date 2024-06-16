@@ -3,172 +3,215 @@ import time
 import readfof
 import argparse
 import numpy as np
-from astropy.table import Table
 from pypower import CatalogFFTPower
 from densitysplit.pipeline import DensitySplit
 
 
-# generates power spectra using the density-split algorithm for the LCDM/PNG Quijote mocks
+def get_halo_positions(halo_path, boxsize, snapnum, redshift, omega_m, min_mass, 
+                       space, los):
+    """Retrieves halo positions in real or redshift space.
 
+    Args:
+        halo_path (str): The folder path of the snapshot.
+        boxsize (float): The boxsize of the simulation volume (Mpc/h).
+        snapnum (int): The snapshot corresponding to given redshift 
+                       {4:0.0, 3:0.5, 2:1.0, 1:2.0, 0:3.0}.
+        redshift (float): The redshift corresponding to the given snapshot.
+        omega_m (float): The omega matter parameter.
+        min_mass (float): The mass cut to apply to the halos (Msun/h).
+        space (str): Real ('r') or redshift ('z') space.
+        los (str): The line-of-sight direction ('x', 'y', 'z').
 
-def process_halo_catalog(halo_path, boxsize, snapnum, redshift, omega_m, min_mass):
-    """Reads in the halo catalog and outputs an astropy table with all the halo
-       positions, velocities and masses."""
-    # LCDM parameters
-    omega_l = 1 - omega_m
+    Returns:
+        array: The 3D positions of the halos (dimension (N, 3)) where N is the 
+               number of halos.
+    """
+    # Assumes flat LCDM cosmology
+    omega_l = 1-omega_m
     H0 = 100
-    # reads in unprocessed data
+    az = 1/(1+redshift)
+    Hz = H0*np.sqrt(omega_m*(1+redshift)**3+omega_l)
+    # Reads in unprocessed catalog
     data = readfof.FoF_catalog(halo_path, snapnum, long_ids=False, swap=False,
                                SFR=False, read_IDs=False)
-    # extracts positions, velocities and masses
+    # Extracts positions, velocities and masses
     pos = data.GroupPos/1e3
     vel = data.GroupVel*(1+redshift)
     mass = data.GroupMass*1e10
-    # applies a mass cut
-    mass_cut = mass > min_mass
+    # Applies mass cut
+    mass_cut = mass >= min_mass
     pos = pos[mass_cut]
     vel = vel[mass_cut]
-    mass = mass[mass_cut]
-    # extracts x,y,z positions and vx,vy,vz velocities
-    xpos, ypos, zpos = pos[:, 0], pos[:, 1], pos[:, 2]
-    xvel, yvel, zvel = vel[:, 0], vel[:, 1], vel[:, 2]
-    # applies RSDs to the positions
-    az = 1/(1+redshift)
-    Hz = H0*np.sqrt(omega_m*(1+redshift)**3+omega_l)
-    xpos_rsd = xpos + xvel/(Hz*az)
-    ypos_rsd = ypos + yvel/(Hz*az)
-    zpos_rsd = zpos + zvel/(Hz*az)
-    # enforces periodic boundary conditions in case points placed outside box
-    xpos_rsd = xpos_rsd % boxsize
-    ypos_rsd = ypos_rsd % boxsize
-    zpos_rsd = zpos_rsd % boxsize
-    # outputs table which contains the positions, velocities and masses
-    output = np.vstack((xpos, ypos, zpos, xpos_rsd, ypos_rsd, zpos_rsd, xvel, yvel, zvel, mass)).T
-    output = Table(output, names=['X', 'Y', 'Z', 'X_RSD', 'Y_RSD', 'Z_RSD', 'VX', 'VY', 'VZ', 'MASS'])
-    return output
-
-def get_halo_positions(halo_table, space, los):
-    """Takes in the processed halo table and outputs the halo positions, either
-       in real or redshift space. If in redshift space, uses the specified line
-       of sight direction."""
-    # extracts the real/redshift space positions
-    xpos = np.array(halo_table['X'])
-    ypos = np.array(halo_table['Y'])
-    zpos = np.array(halo_table['Z'])
-    xpos_rsd = np.array(halo_table['X_RSD'])
-    ypos_rsd = np.array(halo_table['Y_RSD'])
-    zpos_rsd = np.array(halo_table['Z_RSD'])
-    if space == 'r': # real space (no LOS direction needed)
-        pos = np.vstack((xpos, ypos, zpos)).T
-    elif space == 'z': # redshift space
+    # Applies redshift space distortions if needed
+    if space == 'r':
+        return pos
+    elif space == 'z':
         if los == 'x':
-            pos = np.vstack((xpos_rsd, ypos, zpos)).T
+            los_vec = np.array([1, 0, 0])
         elif los == 'y':
-            pos = np.vstack((xpos, ypos_rsd, zpos)).T
+            los_vec = np.array([0, 1, 0])
         elif los == 'z':
-            pos = np.vstack((xpos, ypos, zpos_rsd)).T
-    return pos
+            los_vec = np.array([0, 0, 1])
+        pos = pos + (vel*los_vec)/(az*Hz)
+        # Enforces periodic boundary conditions
+        pos = pos % boxsize
+        return pos
+    
+def get_quantile_positions(halo_positions, n_quantiles, filter_type, filter_radius, 
+                           n_randoms, boxsize, cellsize_ds, cellsize_lattice, query_type, 
+                           resampler, interlacing, compensate, sim_index):
+    """Retrieves quantile positions based on smoothed halo field.
 
-def get_quantile_positions(halo_positions, n_quantiles, filter_type, filter_radius,
-                           n_randoms, boxsize, cellsize_ds, cellsize_lattice,
-                           sim_index, query_type, resampler, interlacing, compensate):
-    """Applies the density-split algorithm on the halo positions to generate quantile
-       query positions (can specify either random positions, lattice/equally spaced
-       positions or the halo positions themselves, depending on the context)."""
-    # initiates random seed to be different for any given simulation
+    Args:
+        halo_positions (array): The halo positions (dimension (N, 3)) where N is the 
+                                number of halos.
+        n_quantiles (int): The number of quantiles.
+        filter_type (str): The smoothing filter type ('TopHat', 'Gaussian').
+        filter_radius (float): The smoothing filter radius (Mpc/h).
+        n_randoms (int): The number of random query positions as a multiple of the 
+                         total number of halos (or None if lattice positions used).
+        boxsize (float): The boxsize of the simulation volume (Mpc/h).
+        cellsize_ds (float): The size of the mesh cells used to obtain the smoothed
+                             density field (Mpc/h).
+        cellsize_lattice (float): The size of the mesh cells used to obtain the 
+                                  lattice query positions (or None if random positions
+                                  are applied) (Mpc/h).
+        query_type (str): The type of query positions ('random', 'lattice', 'halo').
+        resampler (str): The resampler ('ngp', 'cic', 'tsc', 'pcs').
+        interlacing (int): The interlacing order (0, 2).
+        compensate (bool): Whether to apply compensation.
+        sim_index (int): The index of the simulation.
+
+    Returns:
+        list: The list of the quantiles, each of which is an array of positions.
+    """
+    # Initiates random seed to be different for each simulation
     np.random.seed(sim_index)
     if query_type == 'random':
-        # computes the absolute number of randoms needed (as a multiple of the 
-        # number of halos)
+        # Absolute number of randoms
         n_randoms_abs = int(n_randoms*len(halo_positions))
         query_positions = np.random.uniform(0, boxsize, (n_randoms_abs, 3))
     elif query_type == 'lattice':
-        # assigns a 3d lattice with equally spaced query points
+        # Assigns 3d lattice with equally spaced query points
         edges = np.arange(0, boxsize+cellsize_lattice, cellsize_lattice)
-        centres = 1/2 * (edges[:-1] + edges[1:])
+        centres = 1/2*(edges[:-1]+edges[1:])
         lattice_x, lattice_y, lattice_z = np.meshgrid(centres, centres, centres)
         lattice_x = lattice_x.flatten()
         lattice_y = lattice_y.flatten()
         lattice_z = lattice_z.flatten()
         query_positions = np.vstack((lattice_x, lattice_y, lattice_z)).T
-        # shuffles up the query positions randomly so that when densities are
-        # computed and divided into bins there is no preferential ordering
+        # Shuffles positions randomly so no preferential ordering
         np.random.shuffle(query_positions)
     elif query_type == 'halo':
-        # the halo positions themselves are used for query positions
+        # Halo positions themselves used
         query_positions = halo_positions
         np.random.shuffle(query_positions)
-    # initiates density-split object
+    # Initiates density-split object
     ds_obj = DensitySplit(data_positions=halo_positions, boxsize=boxsize)
-    # gets density at the query locations using a meshgrid with finite cells
+    # Gets density at the query locations using meshgrid with finite cells
     ds_obj.get_density_mesh(smooth_radius=filter_radius, cellsize=cellsize_ds,
-                            sampling_positions=query_positions, 
-                            filter_shape=filter_type, resampler=resampler, 
+                            sampling_positions=query_positions,
+                            filter_shape=filter_type, resampler=resampler,
                             interlacing=interlacing, compensate=compensate)
-    # splits query positions into quantiles based on density
+    # Splits query positions into quantiles based on density
     quantiles = ds_obj.get_quantiles(nquantiles=n_quantiles)
     return quantiles
 
-def compute_statistics(halo_table, space, los_dirs, n_quantiles, filter_type, filter_radius, n_randoms, 
-                       boxsize, nmesh, sim_index, query_type, k_edges, resampler, interlacing, compensate, 
-                       redshift, output_folder):
-    """Takes in the processed halo table and the desired parameters, and outputs to file the requested
-       density-split functions in redshift-space (power spectra)."""
-    # the cellsizes to use for the density-split and power spectrum mesh grids
+def generate_statistics(halo_path, boxsize, snapnum, redshift, omega_m, min_mass, space, 
+                        los_dirs, n_quantiles, filter_type, filter_radius, n_randoms, nmesh, 
+                        query_type, resampler, interlacing, compensate, sim_index, k_edges,
+                        output_folder):
+    """Generates the relevant power spectrum results (halo autocorrelation, quantile-halo
+       cross-correlation and quantile autocorrelation) and stores away to file.
+
+    Args:
+        halo_path (str): The folder path of the snapshot.
+        boxsize (float): The boxsize of the simulation volume (Mpc/h).
+        snapnum (int): The snapshot corresponding to given redshift 
+                       {4:0.0, 3:0.5, 2:1.0, 1:2.0, 0:3.0}.
+        redshift (float): The redshift corresponding to the given snapshot.
+        omega_m (float): The omega matter parameter.
+        min_mass (float): The mass cut to apply to the halos (Msun/h).
+        space (str): Real ('r') or redshift ('z') space.
+        los_dirs (list): The line-of-sight directions ('x', 'y', 'z').
+        n_quantiles (int): The number of quantiles.
+        filter_type (str): The smoothing filter type ('TopHat', 'Gaussian').
+        filter_radius (float): The smoothing filter radius (Mpc/h).
+        n_randoms (int): The number of random query positions as a multiple of the 
+                         total number of halos (or None if lattice positions used).
+        nmesh (int): The number of mesh cells per dimension of grid.
+        query_type (str): The type of query positions ('random', 'lattice', 'halo').
+        resampler (str): The resampler ('ngp', 'cic', 'tsc', 'pcs').
+        interlacing (int): The interlacing order (0, 2).
+        compensate (bool): Whether to apply compensation.
+        sim_index (int): The index of the simulation.
+        k_edges (array): The bin edges for wavenumber (h/Mpc).
+        output_folder (str): The folder path to store the results.
+    """
+    # Cellsize to use for density-split and power spectrum mesh grids
     cellsize_ds = boxsize/nmesh
     cellsize_lattice = boxsize/nmesh
-    result = {'x':{}, 'y':{}, 'z':{}} # dictionary to store results for each line of sight direction (all three in this case)
-    # keeps track of the time taken to run each portion of the code
+    # Dictionary to store results for each line of sight direction
+    if los_dirs == ['z']:
+        result = {'z':{}}
+    elif los_dirs == ['x', 'y', 'z']:
+        result = {'x':{}, 'y':{}, 'z':{}}
+    # Keeps track of the time taken to run each portion of the code
     time_process_halos = 0
     time_densitysplit = 0
     time_power = 0
-    for los in los_dirs: # iterates through each line of sight direction
+    # Iterates through each line-of-sight direction
+    for los in los_dirs:
         t0 = time.time()
-        halo_positions = get_halo_positions(halo_table, space, los)
-        time_process_halos += time.time() - t0
+        # Retrieves halo positions
+        halo_positions = get_halo_positions(
+            halo_path, boxsize, snapnum, redshift, omega_m, min_mass, space, los)
+        time_process_halos += time.time()-t0
         t0 = time.time()
+        # Retrieves quantile positions
         ds_quantiles = get_quantile_positions(
-            halo_positions, n_quantiles, filter_type, filter_radius, n_randoms, boxsize, cellsize_ds, 
-            cellsize_lattice, sim_index, query_type, resampler, interlacing, compensate)
-        time_densitysplit += time.time() - t0
+            halo_positions, n_quantiles, filter_type, filter_radius, n_randoms, boxsize,
+            cellsize_ds, cellsize_lattice, query_type, resampler, interlacing, compensate,
+            sim_index)
+        time_densitysplit += time.time()-t0
         t0 = time.time()
-        # halo autocorrelation (uses cic only for halo functions for consistency with other paper)
-        result[los]['h-h'] = CatalogFFTPower(
-            data_positions1=halo_positions, data_positions2=None, edges=k_edges, ells=(0, 2, 4), 
-            los=los, nmesh=nmesh, boxsize=boxsize, resampler='cic', interlacing=0, 
-            position_type='pos')
+        # Halo autocorrelation
+        result[los]['h-h'] = CatalogFFTPower( # Uses 'CIC' for halos for consistency with others
+            data_positions1=halo_positions, edges=k_edges, ells=(0,2,4), los=los, nmesh=nmesh, 
+            boxsize=boxsize, resampler='cic', interlacing=0, position_type='pos')
+        # Iterates through the different quantiles
         for i in range(n_quantiles):
-            # quantile autocorrelation
+            # Quantile-halo cross-correlation
+            result[los][f'{i+1}-h'] = CatalogFFTPower(
+                data_positions1=ds_quantiles[i], data_positions2=halo_positions, edges=k_edges,
+                ells=(0,2,4), los=los, nmesh=nmesh, boxsize=boxsize, resampler=resampler,
+                interlacing=interlacing, position_type='pos')
+            # Quantile autocorrelation
             if query_type == 'lattice':
-                shotnoise=0 # no shot noise for quantile autocorrelation if lattice positions used
+                shotnoise=0
             else:
                 shotnoise=None
             result[los][f'{i+1}-{i+1}'] = CatalogFFTPower(
-                data_positions1=ds_quantiles[i], data_positions2=None, edges=k_edges, ells=(0, 2, 4), 
+                data_positions1=ds_quantiles[i], data_positions2=None, edges=k_edges, ells=(0,2,4),
                 los=los, nmesh=nmesh, boxsize=boxsize, resampler=resampler, interlacing=interlacing,
                 position_type='pos', shotnoise=shotnoise)
-            # quantile-halo cross-correlation
-            result[los][f'{i+1}-h'] = CatalogFFTPower(
-                data_positions1=ds_quantiles[i], data_positions2=halo_positions, edges=k_edges, 
-                ells=(0, 2, 4), los=los, nmesh=nmesh, boxsize=boxsize, resampler=resampler,
-                interlacing=interlacing, position_type='pos')
-        time_power += time.time() - t0
-    # adds the different times to the dictionary
+        time_power += time.time()-t0
+    # Adds different times to dictionary
     result['TIME_PROCESS_HALOS'] = time_process_halos
     result['TIME_DENSITYSPLIT'] = time_densitysplit
     result['TIME_POWER'] = time_power
-    # saves away the functions to file
+    # Saves away functions to file
     np.save(
         os.path.join(
-        output_folder, 
-        f'phase{sim_index}_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}.npy'),
+        output_folder,
+        f'phase{sim_index}_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_{min_mass}_{space}split_{resampler}_{interlacing}_{compensate}.npy'),
         result)
     return None
-            
+
 
 if __name__ == '__main__':
 
-    # since doing parallel processing, specifies the particular range of 
+    # Since doing parallel processing, specifies the particular range of 
     # simulations to run through (array jobs)
     parser = argparse.ArgumentParser()
     parser.add_argument("--start_idx", type=int)
@@ -178,48 +221,59 @@ if __name__ == '__main__':
     n = args.n
     sim_indices = np.arange(start_idx, start_idx+n)
 
-    # parameters for density-split and power spectrum algorithms
-    space = 'z'
-    los_dirs = ['x', 'y', 'z'] # uses all line-of-sight directions to average over derivative noise
-    n_quantiles = 5
-    filter_type = 'Gaussian'
-    filter_radius = 10
+    # Parameters for density-split and power spectrum algorithms
+    boxsize = 1000
     snapnum = 4
     redshift = 0
-    boxsize = 1000
+    space = 'z'
+    filter_type = 'Gaussian'
     nmesh = 512
-    k_edges = np.arange(2*np.pi/boxsize, np.pi/(boxsize/nmesh), 2*np.pi/boxsize)
     resampler = 'tsc'
     interlacing = 0
-    compensate = True
-    # iterates through the different parameter variations
-    for variation in ['LC_m', 'LC_p', 'EQ_m', 'EQ_p', 'OR_LSS_m', 'OR_LSS_p', # PNG variations
-                      'Om_m', 'Om_p', 'h_m', 'h_p', 'ns_m', 'ns_p', 's8_m', 's8_p', # LCDM variations
-                      'Mmin_3.1e13', 'Mmin_3.3e13']: # bias variations
-        if variation == 'Om_m':
-            omega_m = 0.3075
-        elif variation == 'Om_p':
-            omega_m = 0.3275
-        else:
-            omega_m = 0.3175 # adjusts omega_m when needed
-        if variation == 'Mmin_3.1e13':
-            min_mass = 3.1e13
-            variation_label = 'fiducial'
-        elif variation == 'Mmin_3.3e13':
-            min_mass = 3.3e13
-            variation_label = 'fiducial'
-        else:
-            min_mass = 3.2e13 # adjusts min_mass and labels when needed
-            variation_label = variation
-        halo_folder = f'/home/jgmorawe/scratch/quijote/{variation_label}'
-        output_folder = f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/ds_functions/power/{variation}'
-        # iterates through different scenarios (lattice, random and halo query positions)
-        for parameters in [(None, 'lattice'), (5, 'random'), (None, 'halo')]:
-            n_randoms, query_type = parameters
-            # iterates through the different simulation indices
+    compensate=True
+    k_edges = np.arange(2*np.pi/boxsize, np.pi/(boxsize/nmesh), 2*np.pi/boxsize)
+    # Iterates through different combinations of the hyperparameters
+    for hyperparameters in [(5, 10, None, 'lattice'), 
+                            (3, 10, None, 'lattice'), 
+                            (7, 10, None, 'lattice'),
+                            (5, 7, None, 'lattice'),
+                            (5, 13, None, 'lattice'),
+                            (5, 10, 5, 'random')]:
+        n_quantiles, filter_radius, n_randoms, query_type = hyperparameters
+        # Iterates through the different parameter variations
+        for variation in ['LC_m', 'LC_p', 'EQ_m', 'EQ_p', 'OR_LSS_m', 'OR_LSS_p',
+                          'Mmin_3.1e13', 'Mmin_3.3e13', 'h_m', 'h_p', 'ns_m', 'ns_p',
+                          'Om_m', 'Om_p', 's8_m', 's8_p']:
+            # Selects appropriate omega matter parameter
+            if variation == 'Om_m':
+                omega_m = 0.3075
+            elif variation == 'Om_p':
+                omega_m = 0.3275
+            else:
+                omega_m = 0.3175
+            # Selects appropriate mass cut parameter
+            if variation == 'Mmin_3.1e13':
+                min_mass = 3.1e13
+            elif variation == 'Mmin_3.3e13':
+                min_mass = 3.3e13
+            else:
+                min_mass = 3.2e13
+            if variation == 'fiducial':
+                los_dirs = ['z']
+            else:
+                los_dirs = ['x', 'y', 'z']
+            # Selects appropraite halo folder label
+            if variation in ['fiducial', 'Mmin_3.1e13', 'Mmin_3.3e13']:
+                halo_folder_label = 'fiducial'
+            else:
+                halo_folder_label = variation
+            # Folders where the halos and output are/will be stored
+            halo_folder = f'/home/jgmorawe/scratch/quijote/{halo_folder_label}'
+            output_folder = f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/ds_functions/power/{variation}'
+            # Iterates through the different simulation indices
             for sim_index in sim_indices:
                 halo_path = os.path.join(halo_folder, f'{sim_index}')
-                halo_table = process_halo_catalog(halo_path, boxsize, snapnum, redshift, omega_m, min_mass)
-                compute_statistics(halo_table, space, los_dirs, n_quantiles, filter_type, filter_radius,
-                                   n_randoms, boxsize, nmesh, sim_index, query_type, k_edges, resampler,
-                                   interlacing, compensate, redshift, output_folder)
+                generate_statistics(
+                    halo_path, boxsize, snapnum, redshift, omega_m, min_mass, space, los_dirs, n_quantiles, filter_type,
+                    filter_radius, n_randoms, nmesh, query_type, resampler, interlacing, compensate, sim_index,
+                    k_edges, output_folder)
