@@ -14,14 +14,13 @@ if __name__ == '__main__':
     filter_type = 'Gaussian'
     nmesh = 512
     redshift = 0
-    mass_cut = 32000000000000.0
     split = 'zsplit'
     resampler = 'tsc'
     interlacing = 0
     compensate = True
     # Iterates through the separate hyperparameter cases
-    for hyperparameters in [(5, 10, None, 'lattice'), 
-                            (3, 10, None, 'lattice'), 
+    for hyperparameters in [(5, 10, None, 'lattice'),
+                            (3, 10, None, 'lattice'),
                             (7, 10, None, 'lattice'),
                             (5, 7, None, 'lattice'),
                             (5, 13, None, 'lattice'),
@@ -47,6 +46,12 @@ if __name__ == '__main__':
                 N_sims = 500
                 los_dirs = ['x', 'y', 'z']
                 results = {'x':{}, 'y':{}, 'z':{}}
+            if variation == 'Mmin_3.1e13':
+                mass_cut = 31000000000000.0
+            elif variation == 'Mmin_3.3e13':
+                mass_cut = 33000000000000.0
+            else:
+                mass_cut = 32000000000000.0
             for ds_func in ds_funcs:
                 for los_dir in los_dirs:
                     # Creates empty array to store monopole and quadropole realizations for each function
@@ -61,7 +66,7 @@ if __name__ == '__main__':
                     for los_dir in los_dirs:
                         results[los_dir][ds_func + '(0)'][i] = data[los_dir][ds_func].poles[:len_power_new*rebin_factor:rebin_factor].power.real[0]
                         results[los_dir][ds_func + '(2)'][i] = data[los_dir][ds_func].poles[:len_power_new*rebin_factor:rebin_factor].power.real[1]
-                if i % 100 == 0: print(i) # prints out progress to track runtime
+                if i % 100 == 0: print('phase', i, 'DONE') # prints out progress to track runtime
             results['k_avg'] = data[los_dir][ds_func].poles[:len_power_new*rebin_factor:rebin_factor].kavg # stores the mean k value in each bin
             np.save(os.path.join(
                 path_save, f'power_{variation}_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_{mass_cut}_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy'),
