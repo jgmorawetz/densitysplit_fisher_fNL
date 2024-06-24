@@ -206,15 +206,15 @@ if __name__ == '__main__':
         # Paths to read existing data
         start_path = '/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/ds_functions/power/MERGED_DATA'
         fiducial_path = os.path.join(start_path,
-            f'power_fiducial_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy')
+            f'power_fiducial_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_32000000000000.0_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy')
         low_paths = list(map(lambda x: os.path.join(start_path,
-            f'power_{x}_m_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy')
+            f'power_{x}_m_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_32000000000000.0_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy')
             if x != 'Mmin' else os.path.join(start_path,
-            f'power_Mmin_3.1e13_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy'), param_names))
+            f'power_Mmin_3.1e13_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_31000000000000.0_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy'), param_names))
         high_paths = list(map(lambda x: os.path.join(start_path,
-            f'power_{x}_p_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy')
+            f'power_{x}_p_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_32000000000000.0_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy')
             if x != 'Mmin' else os.path.join(start_path,
-            f'power_Mmin_3.3e13_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy'), param_names))
+            f'power_Mmin_3.3e13_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_33000000000000.0_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy'), param_names))
         n_realizations_cov = 15000
         k_upper = 0.5
         # Varies the number of derivative realizations used
