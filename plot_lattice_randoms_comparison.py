@@ -19,7 +19,7 @@ if __name__ == '__main__':
     lattice_mean, lattice_std = np.mean(lattice_data['z'][f'{q}-{q}({l})'][:, k_cut], axis=0), np.std(lattice_data['z'][f'{q}-{q}({l})'][:, k_cut], axis=0)
     random_mean, random_std = np.mean(random_data['z'][f'{q}-{q}({l})'][:, k_cut], axis=0), np.std(random_data['z'][f'{q}-{q}({l})'][:, k_cut], axis=0)
 
-    fig, ax = plt.subplots(3, 1, sharex=True, sharey=False, dpi=300, figsize=(6, 5), height_ratios=[2, 1, 2])
+    fig, ax = plt.subplots(3, 1, sharex=True, sharey=False, dpi=400, figsize=(6, 5), height_ratios=[2, 1, 2])
     fig.subplots_adjust(left=0.11, right=0.98, top=0.97, bottom=0.1, hspace=0.15, wspace=0.1)
     ax[0].plot(k_avg, k_avg**2*random_mean, '-', color='green', linewidth=1, label='Random')
     ax[0].fill_between(x=k_avg, y1=k_avg**2*(random_mean-random_std), y2=k_avg**2*(random_mean+random_std), alpha=0.2, color='green')
