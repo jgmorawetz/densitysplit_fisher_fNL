@@ -2,7 +2,6 @@ import os
 import pickle
 import numpy as np; np.random.seed(0)
 import matplotlib.pyplot as plt
-from getdist import plots, MCSamples 
 
 
 def inverse_covariance_matrix(realizations, n_realizations, functions, k_cut, n_param):
@@ -119,9 +118,9 @@ def max_wavenumber_constraints(func_combination_list, func_combination_label, pa
     # Initiates list to store all the parameter covariance matrices for each of the kmax values
     param_cov_matrices = []
     k_max_vals = []
-    # Iterates through the different max fitting wavenumbers (skips every other wavenumber though
-    # to save runtime)
-    for k_max in k_avg[(k_avg >= k_avg[2]) & (k_avg <= k_upper)][::2]:
+    # Iterates through the different max fitting wavenumbers (only samples every fourth
+    # wavenumber to save runtime)
+    for k_max in k_avg[(k_avg >= k_avg[2]) & (k_avg <= k_upper)][::4]:
         k_max_vals.append(k_max)
         k_cut = k_avg <= k_max
         # Initiates Fisher information matrix
