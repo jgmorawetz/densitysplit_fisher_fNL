@@ -7,4 +7,4 @@ This repository contains all the codes necessary to reproduce the results in the
 
 3) Under the folder 'generate_statistics', run 'merge_power_files.py' to combine all the power spectrum results for each simulation (stored in individual files) into one file containing all realizations.
 
-4) Run 'produce_fisher_constraints.py' to generate the parameter covariance matrices as a function of fitting wavenumber (and in doing so produce the results needed for plots ...).
+4) Under the folder 'generate_statistics', run 'produce_fisher_constraints.py' to generate the parameter covariance matrices (inverse of the Fisher matrices) as a function of fitting wavenumber, and in doing so produce the results needed for figures 3 and 4.
