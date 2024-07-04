@@ -13,3 +13,4 @@ This repository contains all the codes necessary to reproduce the results in the
    - Run 'plot_densitysplit_cross_section.py' to generate figure 1.
    - Run 'plot_fiducial_power_spectra.py' to generate figure 2.
    - Run 'plot_constraints_max_wavenumber.py' to generate figure 3.
+   - Run 'plot_contours.py' to generate figure 4.
