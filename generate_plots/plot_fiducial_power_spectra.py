@@ -68,8 +68,8 @@ if __name__ == '__main__':
     # Adjusts plot parameters
     ax[0][0].legend(); ax[1][0].set_xlabel(r'$k \ [hMpc^{-1}]$')
     ax[1][1].set_xlabel(r'$k \ [hMpc^{-1}]$')
-    ax[0][0].set_ylabel(r'$k^2 P(k) \ [h^{-1}Mpc]$')
-    ax[1][0].set_ylabel(r'$k^2 P(k) \ [h^{-1}Mpc]$')
+    ax[0][0].set_ylabel(r'$k^2 P_0(k) \ [h^{-1}Mpc]$')
+    ax[1][0].set_ylabel(r'$k^2 P_2(k) \ [h^{-1}Mpc]$')
     ax[0][0].set_title('Quantile Auto')
     ax[0][1].set_title('Quantile-Halo Cross')
     ax[0][0].set_xscale('log')
