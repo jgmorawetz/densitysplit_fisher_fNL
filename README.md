@@ -9,4 +9,6 @@ This repository contains all the codes necessary to reproduce the results in the
 
 4) Under the folder 'generate_statistics', run 'produce_fisher_constraints.py' to generate the parameter covariance matrices (inverse of the Fisher matrices) as a function of fitting wavenumber, and in doing so produce the results needed for figures 3 and 4.
 
-5) Under the folder 'generate_plots', run 'plot_densitysplit_cross_section.py' to generate figure 1.
+5) Under the folder 'generate_plots':
+   - Run 'plot_densitysplit_cross_section.py' to generate figure 1.
+   - Run 'plot_fiducial_power_spectra.py' to generate figure 2.
