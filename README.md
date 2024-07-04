@@ -12,3 +12,4 @@ This repository contains all the codes necessary to reproduce the results in the
 5) Under the folder 'generate_plots':
    - Run 'plot_densitysplit_cross_section.py' to generate figure 1.
    - Run 'plot_fiducial_power_spectra.py' to generate figure 2.
+   - Run 'plot_constraints_max_wavenumber.py' to generate figure 3.
