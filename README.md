@@ -16,3 +16,4 @@ This repository contains all the codes necessary to reproduce the results in the
    - Run 'plot_contours.py' to generate figure 4.
    - Run 'plot_derivative_covariance_convergence.py' to generate figure 5.
    - Run 'plot_corrected_constraints.py' to generate figures 6 and 7.
+   - Run 'plot_PNG_LCDM_derivatives.py' to generate figure 8.
