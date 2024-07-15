@@ -53,6 +53,9 @@ if __name__ == '__main__':
     ax.legend(loc=1)
     fig.savefig(os.path.join(data_folder, 'raw_corrected_relative_improvement_constraints.png'))
 
+    # Makes a plot of the relative improvement (corrected) between the joint halo/DSC power spectra vs halo
+    # power spectrum for each the parameters, depending on the hyperparameter choice
+
     fig2, ax2 = plt.subplots(dpi=400)
     x_vals = np.arange(8)
     ax2.plot(np.array(x_vals), corrected_lattice_3_10[:, 0]/corrected_lattice_3_10[:, 2], '^', label='Lattice, ' + r'$N_{quantile}=$' + '3, ' + r'$R_s=$' + '10', markersize=markersize, color='tab:blue')
