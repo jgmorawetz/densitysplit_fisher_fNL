@@ -72,8 +72,8 @@ if __name__ == '__main__':
         if variation == 's8':
             low_up_diff = 0.03
         # Reads in the data for each parameter variation
-        lower_data_lattice = np.load(os.path.join(data_folder, 'power_LC_m_Gaussian_10_5_512_lattice_None_0_32000000000000.0_zsplit_tsc_0_True_1kF.npy'), allow_pickle=True).item()
-        upper_data_lattice = np.load(os.path.join(data_folder, 'power_LC_p_Gaussian_10_5_512_lattice_None_0_32000000000000.0_zsplit_tsc_0_True_1kF.npy'), allow_pickle=True).item()
+        lower_data_lattice = np.load(os.path.join(data_folder, f'power_{variation}_m_Gaussian_10_5_512_lattice_None_0_32000000000000.0_zsplit_tsc_0_True_1kF.npy'), allow_pickle=True).item()
+        upper_data_lattice = np.load(os.path.join(data_folder, f'power_{variation}_p_Gaussian_10_5_512_lattice_None_0_32000000000000.0_zsplit_tsc_0_True_1kF.npy'), allow_pickle=True).item()
         for q in [1,2,3,4,5]:
             if q == 1: color, label = 'mediumblue', 'DS1'
             elif q == 2: color, label = 'cornflowerblue', 'DS2'
