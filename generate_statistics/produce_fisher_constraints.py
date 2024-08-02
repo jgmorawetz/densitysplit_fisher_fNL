@@ -195,8 +195,10 @@ if __name__ == '__main__':
         save_path = f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/fisher_convergence/power/{query_type}_{n_randoms}_{n_quantiles}_{filter_radius}'
         # All the function combinations to produce results for
         halo_terms = ['h-h(0)', 'h-h(2)']
-        DS_terms = list(np.concatenate([[f'{i+1}-h(0)', f'{i+1}-h(2)', f'{i+1}-{i+1}(0)', f'{i+1}-{i+1}(2)']
-                        for i in list(range(n_quantiles//2))+list(range(n_quantiles//2+1, n_quantiles))])) # skips middle quantile
+        DS_cross_terms = list(np.concatenate([[f'{i+1}-h(0)', f'{i+1}-h(2)'] # skips the middle quantile for quantile-halo cross, but NOT for quantile auto
+                              for i in list(range(n_quantiles//2))+list(range(n_quantiles//2+1, n_quantiles))]))
+        DS_auto_terms = list(np.concatenate([[f'{i+1}-{i+1}(0)', f'{i+1}-{i+1}(2)'] for i in range(n_quantiles)]))
+        DS_terms = DS_cross_terms + DS_auto_terms
         joint_terms = halo_terms + DS_terms
         functions_list = [halo_terms, DS_terms, joint_terms]
         function_labels = ['Halo', 'DS', 'Joint']
