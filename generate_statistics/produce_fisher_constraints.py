@@ -220,7 +220,7 @@ if __name__ == '__main__':
         n_realizations_cov = 15000#n_realizations_deriv = 500
         k_upper = 0.5
         # Varies the number of derivative realizations used
-        for n_realizations_deriv in np.arange(10, 510, 10):#for n_realizations_cov in np.arange(1500, 15300, 300):
+        for n_realizations_deriv in np.arange(10, 510, 10):#n_realizations_cov in np.arange(2100, 15300, 300):
             for i in range(len(functions_list)):
                 functions = functions_list[i]
                 function_label = function_labels[i]
