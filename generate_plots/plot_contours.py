@@ -47,4 +47,4 @@ if __name__ == '__main__':
     g.triangle_plot(roots=samples, 
                     legend_labels=['Halo', 'DSC', 'Joint'],
                     filled=True, contour_colors=comb_colors)
-    plt.savefig('/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/constraints_contour_plot.png', dpi=400)
+    plt.savefig('/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/constraints_contour_plot_including_all_auto.png', dpi=400)

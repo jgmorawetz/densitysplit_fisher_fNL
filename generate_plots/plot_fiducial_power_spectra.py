@@ -37,12 +37,6 @@ if __name__ == '__main__':
     halo_monopole, halo_quadropole = fiducial_power['h-h(0)'], fiducial_power['h-h(2)']
     halo_monopole_mean, halo_monopole_std = np.mean(halo_monopole, axis=0), np.std(halo_monopole, axis=0)
     halo_quadropole_mean, halo_quadropole_std = np.mean(halo_quadropole, axis=0), np.std(halo_quadropole, axis=0)
-  #  ax[0][0].fill_between(x=k_avg, y1=k_avg**2*(halo_monopole_mean-halo_monopole_std),
-  #                        y2=k_avg**2*(halo_monopole_mean+halo_monopole_std), alpha=0.2, color='black')
-  #  ax[0][0].plot(k_avg, k_avg**2*halo_monopole_mean, '-', color='black', label='Halo')
-  #  ax[1][0].fill_between(x=k_avg, y1=k_avg**2*(halo_quadropole_mean-halo_quadropole_std),
-  #                        y2=k_avg**2*(halo_quadropole_mean+halo_quadropole_std), alpha=0.2, color='black')
-  #  ax[1][0].plot(k_avg, k_avg**2*halo_quadropole_mean, '-', color='black')
     # Iterates through the quantile power spectra
     colors = ['mediumblue', 'cornflowerblue', 'grey', 'lightsalmon', 'firebrick'] # need to add/remove colors if using more/less than five quantiles
     for i in range(n_quantiles):
@@ -77,4 +71,4 @@ if __name__ == '__main__':
     ax[0][1].ticklabel_format(scilimits=(0,0), axis='y')
     ax[1][0].ticklabel_format(scilimits=(0,0), axis='y')
     ax[1][1].ticklabel_format(scilimits=(0,0), axis='y')
-    fig.savefig('/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/fiducial_power_spectra.png')
+    fig.savefig('/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/fiducial_fixed_power_spectra.png')#########################

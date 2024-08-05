@@ -7,18 +7,18 @@ if __name__ == '__main__':
 
     # Reads in the produced constraint data
     data_folder = '/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results'
-    raw_lattice_5_10 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_5_10.npy'))
-    raw_random_5_10 = np.load(os.path.join(data_folder, 'constraints_raw_random_5_5_10.npy'))
-    raw_lattice_3_10 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_3_10.npy'))
-    raw_lattice_7_10 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_7_10.npy'))
-    raw_lattice_5_7 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_5_7.npy'))
-    raw_lattice_5_13 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_5_13.npy'))
-    corrected_lattice_5_10 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_5_10.npy'))
-    corrected_random_5_10 = np.load(os.path.join(data_folder, 'constraints_corrected_random_5_5_10.npy'))
-    corrected_lattice_3_10 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_3_10.npy'))
-    corrected_lattice_7_10 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_7_10.npy'))
-    corrected_lattice_5_7 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_5_7.npy'))
-    corrected_lattice_5_13 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_5_13.npy'))
+    raw_lattice_5_10 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_5_10_including_all_auto.npy'))
+    raw_random_5_10 = np.load(os.path.join(data_folder, 'constraints_raw_random_5_5_10_including_all_auto.npy'))
+    raw_lattice_3_10 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_3_10_including_all_auto.npy'))
+    raw_lattice_7_10 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_7_10_including_all_auto.npy'))
+    raw_lattice_5_7 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_5_7_including_all_auto.npy'))
+    raw_lattice_5_13 = np.load(os.path.join(data_folder, 'constraints_raw_lattice_None_5_13_including_all_auto.npy'))
+    corrected_lattice_5_10 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_5_10_including_all_auto.npy'))
+    corrected_random_5_10 = np.load(os.path.join(data_folder, 'constraints_corrected_random_5_5_10_including_all_auto.npy'))
+    corrected_lattice_3_10 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_3_10_including_all_auto.npy'))
+    corrected_lattice_7_10 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_7_10_including_all_auto.npy'))
+    corrected_lattice_5_7 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_5_7_including_all_auto.npy'))
+    corrected_lattice_5_13 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_5_13_including_all_auto.npy'))
 
     # Makes a plot of the relative (corrected and raw) improvement between the joint halo/DSC power spectra vs halo 
     # power spectrum for each of the parameters
@@ -34,8 +34,10 @@ if __name__ == '__main__':
         # normalizes constraints to the halo power spectrum constraints
         ax.plot(np.array(x_vals)+0.1, corrected_lattice_5_10[:, 0]/corrected_lattice_5_10[:, i], '^', 
                    color=comb_colors[i-1], label=comb_labels[i-1], markersize=markersize)
-    print(raw_lattice_5_10[:, 0]/raw_lattice_5_10[:, 2])
-    print(corrected_lattice_5_10[:, 0]/corrected_lattice_5_10[:, 2])
+    print('(Raw) halo-only constraints:', list(np.round(raw_lattice_5_10[:, 0], 6)))
+    print('(Corrected) halo-only constraints:', list(np.round(corrected_lattice_5_10[:, 0], 6)))
+    print('(Raw) relative improvements:', list(np.round(raw_lattice_5_10[:, 0]/raw_lattice_5_10[:, 2], 6)))
+    print('(Corrected) relative improvements:', list(np.round(corrected_lattice_5_10[:, 0]/corrected_lattice_5_10[:, 2], 6)))
     for i in range(1, 3):
         ax.plot(np.array(x_vals)-0.1, raw_lattice_5_10[:, 0]/raw_lattice_5_10[:, i], 'X', 
                    color=comb_colors[i-1], label=comb_labels[i-1]+' (raw)', markersize=markersize)
@@ -51,7 +53,7 @@ if __name__ == '__main__':
     ax.set_xticks([0,1,2,3,4,5,6,7])
     ax.set_xticklabels(x_tick_labels)
     ax.legend(loc=1)
-    fig.savefig(os.path.join(data_folder, 'raw_corrected_relative_improvement_constraints.png'))
+    fig.savefig(os.path.join(data_folder, 'raw_corrected_relative_improvement_constraints_including_all_auto.png'))
 
     # Makes a plot of the relative improvement (corrected) between the joint halo/DSC power spectra vs halo
     # power spectrum for each the parameters, depending on the hyperparameter choice
@@ -78,4 +80,4 @@ if __name__ == '__main__':
     ax2.set_yticks([1,2,3,4,5,6,7,8,9,10])
     ax2.set_yticklabels([1,2,3,4,5,6,7,8,9,10])
     ax2.set_ylabel(comb_labels[1])
-    fig2.savefig(os.path.join(data_folder, 'relative_improvement_hyperparameters.png'))
+    fig2.savefig(os.path.join(data_folder, 'relative_improvement_hyperparameters_including_all_auto.png'))
