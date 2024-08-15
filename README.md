@@ -1,7 +1,7 @@
 # densitysplit_fisher_fNL
 This repository contains all the codes necessary to reproduce the results in the paper...
 
-1) Begin by downloading the halo catalogs for the different parameter variations found at /Halos/FoF/ on Globus collection 'Quijote_simulations2'.
+1) Begin by downloading the halo catalogs for the different parameter variations found at /Halos/FoF/ on Globus collection 'Quijote_simulations2'. The data for redshift snapshot z=0 are found under 'groups_004' tab.
 
 2) Set up bash scripts to run array jobs (iterating through the simulation indices) to execute the python scripts 'densitysplit_power_fiducial.py' and 'densitysplit_power_LCDM_PNG.py', which generate all the necessary power spectra and save away to file.
 
@@ -16,4 +16,3 @@ This repository contains all the codes necessary to reproduce the results in the
    - Run 'plot_contours.py' to generate figure 4.
    - Run 'plot_derivative_covariance_convergence.py' to generate figure 5.
    - Run 'plot_corrected_constraints.py' to generate figures 6 and 7.
-   - Run 'plot_PNG_LCDM_derivatives.py' to generate figure 8.
