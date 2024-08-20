@@ -5,7 +5,7 @@ This repository contains all the codes necessary to reproduce the results in the
 
 2) Set up bash scripts to run array jobs (iterating through the simulation indices) to execute the python scripts 'densitysplit_power_fiducial.py' and 'densitysplit_power_LCDM_PNG.py' under the folder 'generate_statistics', which generate all the necessary power spectra used in the Fisher analysis and save away to file.
 
-3) Under the folder 'generate_statistics', run 'merge_power_files.py' to combine all the power spectrum results for each simulation (stored in individual files) into one file containing all realizations. These merged files are also stored under the 'data/fisher' folder.
+3) Under the folder 'generate_statistics', run 'merge_power_files.py' to combine all the power spectrum results for each simulation (stored in individual files) into one file containing all realizations.
 
 4) Under the folder 'generate_statistics', run 'produce_fisher_constraints.py' to generate the parameter covariance matrices (inverse of the Fisher matrices) as a function of fitting wavenumber, and in doing so produce the results needed for figures 3 and 4.
 
