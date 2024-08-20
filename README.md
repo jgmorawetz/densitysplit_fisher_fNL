@@ -1,5 +1,5 @@
 # densitysplit_fisher_fNL
-This repository contains all the codes necessary to reproduce the results in the paper...
+This repository contains all the codes necessary to reproduce the results in the paper 'Constraining Primordial Non-Gaussianity with Density-Split Clustering'.
 
 1) Begin by downloading the halo catalogs for the different parameter variations found at /Halos/FoF/ on Globus collection 'Quijote_simulations2'. The data for redshift snapshot z=0 are found under 'groups_004' tab.
 
