@@ -174,8 +174,6 @@ if __name__ == '__main__':
 
     # Obtains Fisher constraints (marginalized and unmarginalized) as a function of the maximum
     # fitting wavenumber for different function combinations
-
-    # Iterates through the different hyperparameter scenarios
     filter_type = 'Gaussian'
     nmesh = 512
     redshift = 0
@@ -217,10 +215,12 @@ if __name__ == '__main__':
             f'power_{x}_p_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_32000000000000.0_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy')
             if x != 'Mmin' else os.path.join(start_path,
             f'power_Mmin_3.3e13_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_33000000000000.0_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy'), param_names))
-        n_realizations_cov = 15000#n_realizations_deriv = 500
+        n_realizations_cov = 15000
+        #n_realizations_deriv = 500
         k_upper = 0.5
-        # Varies the number of derivative realizations used
-        for n_realizations_deriv in np.arange(10, 510, 10):#n_realizations_cov in np.arange(2100, 15300, 300):
+        # Varies the number of derivative realizations (or covariance realizations if switch out commented out section of code)
+        for n_realizations_deriv in np.arange(10, 510, 10):
+            #n_realizations_cov in np.arange(2100, 15300, 300):
             for i in range(len(functions_list)):
                 functions = functions_list[i]
                 function_label = function_labels[i]
