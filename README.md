@@ -3,7 +3,7 @@ This repository contains all the codes necessary to reproduce the results in the
 
 1) Begin by downloading the halo catalogs for the different parameter variations found at /Halos/FoF/ on Globus collection 'Quijote_simulations2'. The data for redshift snapshot z=0 are found under 'groups_004' tab.
 
-2) Set up bash scripts to run array jobs (iterating through the simulation indices) to execute the python scripts 'densitysplit_power_fiducial.py' and 'densitysplit_power_LCDM_PNG.py', which generate all the necessary power spectra and save away to file.
+2) Set up bash scripts to run array jobs (iterating through the simulation indices) to execute the python scripts 'densitysplit_power_fiducial.py' and 'densitysplit_power_LCDM_PNG.py', which generate all the necessary power spectra used in the Fisher analysis and save away to file.
 
 3) Under the folder 'generate_statistics', run 'merge_power_files.py' to combine all the power spectrum results for each simulation (stored in individual files) into one file containing all realizations.
 
