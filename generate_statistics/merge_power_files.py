@@ -2,12 +2,8 @@ import os
 import numpy as np
 
 
-# Merges the fiducial & LCDM/PNG Quijote power spectrum files together appropriately
-
-
 if __name__ == '__main__':
 
-    # Fixed hyperparameters across all separate versions of the power spectrum
     len_power = 254 # using k bins from 2*np.pi/boxsize to np.pi/(boxsize/nmesh) in steps of 2*np.pi/boxsize
     rebin_factor = 1 # the integer multiple to rebin from the original bin resolution
     len_power_new = len_power // rebin_factor
