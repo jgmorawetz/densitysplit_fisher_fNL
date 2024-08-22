@@ -118,7 +118,7 @@ if __name__ == '__main__':
     overdensity_label = np.flip(overdensity_label, axis=0) # flips so x runs left to right, y bottom to top
     density = density[0:dim//2, 0:dim//2]
     density = np.flip(density, axis=0)
-    fig, ax = plt.subplots(1, 2, sharex=True, sharey=True, dpi=400, figsize=(7, 3.5))
+    fig, ax = plt.subplots(1, 2, sharex=True, sharey=True, dpi=500, figsize=(7, 3.5))
     fig.subplots_adjust(wspace=0.075, left=0.09, right=0.97, top=0.97, bottom=0.13)
     ax[0].set_aspect('equal')
     ax[1].set_aspect('equal')
@@ -132,4 +132,4 @@ if __name__ == '__main__':
     ax[0].set_ylabel(r'$\mathrm{y} \ [h^{-1}\mathrm{Mpc}]$')
     ax[1].set_xlabel(r'$\mathrm{x} \ [h^{-1}\mathrm{Mpc}]$')
     ax[1].legend(handles=patches)
-    fig.savefig(os.path.join(plot_folder, f'phase{phase}_cross_section.png'))
+    fig.savefig(os.path.join(plot_folder, f'phase{phase}_cross_section.pdf'))
