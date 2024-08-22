@@ -126,7 +126,7 @@ if __name__ == '__main__':
     ax[0].plot(halo_positions_slice[:, 0], halo_positions_slice[:, 1], 'o', color='black', markersize=1)
     im = ax[1].imshow(X=overdensity_label, cmap='turbo', extent=(0, 500, 0, 500))
     colors = [im.cmap(im.norm(value)) for value in np.arange(1, n_quantiles+1)]
-    patches = [mpatches.Patch(color=colors[i], label='DS{}'.format(np.arange(1, n_quantiles+1)[i])) for 
+    patches = [mpatches.Patch(color=colors[i], label='Q{}'.format(np.arange(1, n_quantiles+1)[i])) for 
                i in range(len(np.arange(1, n_quantiles+1)))]
     ax[0].set_xlabel(r'$\mathrm{x} \ [h^{-1}\mathrm{Mpc}]$')
     ax[0].set_ylabel(r'$\mathrm{y} \ [h^{-1}\mathrm{Mpc}]$')
