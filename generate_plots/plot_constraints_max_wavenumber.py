@@ -8,9 +8,8 @@ if __name__ == '__main__':
       
     # Plots constraints as a function of maximum wavenumber (both marginalized and unmarginalized
     # for halo only, DS only or joint)
-    fig, ax = plt.subplots(2, 4, sharex=True, sharey=False, dpi=400, figsize=(9,6))
+    fig, ax = plt.subplots(2, 4, sharex=True, sharey=False, dpi=500, figsize=(9,6))
     fig.subplots_adjust(hspace=0.13, wspace=0.3, left=0.15, right=0.97, top=0.95, bottom=0.12)
-    # Specific hyperparameters
     k_avg = np.load('/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/ds_functions/power/MERGED_DATA/power_fiducial_Gaussian_10_5_512_lattice_None_0_32000000000000.0_zsplit_tsc_0_True_1kF.npy', allow_pickle=True).item()['k_avg']
     k_upper = 0.5
     kmax_vals = k_avg[(k_avg >= k_avg[2]) & (k_avg <= k_upper)][::4]
@@ -18,7 +17,7 @@ if __name__ == '__main__':
     ncov, nderiv = 15000, 500
     data_folder = f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/fisher_convergence/power/{query_type}_{n_randoms}_{n_quantiles}_{filter_radius}'
     param_list = ['LC', 'EQ', 'OR_LSS', 'Mmin', 'h', 'ns', 'Om', 's8']
-    param_list_labels = [r'$f_{NL}^{loc}$', r'$f_{NL}^{equil}$', r'$f_{NL}^{ortho}$', r'$M_{min}$', r'$h$', r'$n_s$', r'$\Omega_m$', r'$\sigma_8$']
+    param_list_labels = [r'$f_{\mathrm{NL}}^{\mathrm{loc}}$', r'$f_{\mathrm{NL}}^{\mathrm{equil}}$', r'$f_{\mathrm{NL}}^{\mathrm{ortho}}$', r'$M_{\mathrm{min}}$', r'$h$', r'$n_{\mathrm{s}}$', r'$\Omega_{\mathrm{m}}$', r'$\sigma_8$']
     combs = ['Halo', 'DS', 'Joint']
     comb_colors = ['tab:blue', 'tab:orange', 'tab:green']
     for i in range(3):
@@ -54,10 +53,10 @@ if __name__ == '__main__':
     ax[0][1].set_yscale('log'); ax[1][1].set_yscale('log')
     ax[0][2].set_yscale('log'); ax[1][2].set_yscale('log')
     ax[0][3].set_yscale('log'); ax[1][3].set_yscale('log')
-    ax[1][0].set_xlabel(r'$k_{max} \ [hMpc^{-1}]$')
-    ax[1][1].set_xlabel(r'$k_{max} \ [hMpc^{-1}]$')
-    ax[1][2].set_xlabel(r'$k_{max} \ [hMpc^{-1}]$')
-    ax[1][3].set_xlabel(r'$k_{max} \ [hMpc^{-1}]$')
+    ax[1][0].set_xlabel(r'$k_{\mathrm{max}} \ [h\mathrm{Mpc}^{-1}]$')
+    ax[1][1].set_xlabel(r'$k_{\mathrm{max}} \ [h\mathrm{Mpc}^{-1}]$')
+    ax[1][2].set_xlabel(r'$k_{\mathrm{max}} \ [h\mathrm{Mpc}^{-1}]$')
+    ax[1][3].set_xlabel(r'$k_{\mathrm{max}} \ [h\mathrm{Mpc}^{-1}]$')
     ax[0][0].set_ylabel(r'$\sigma$')
     ax[1][0].set_ylabel(r'$\sigma$')
-    fig.savefig('/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/constraints_max_wavenumber_including_all_auto.png')
+    fig.savefig('/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/constraints_max_wavenumber_including_all_auto.pdf')
