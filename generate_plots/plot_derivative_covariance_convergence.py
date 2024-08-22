@@ -23,17 +23,16 @@ if __name__ == '__main__':
     
     # Makes plot of the normalized constraints as a function of number of derivative realizations averaged over
     # (holding the number of covariance matrix realizations constant at 15000)
-    query_type, n_randoms, n_quantiles, filter_radius = 'lattice', None, 5, 10
+    query_type, n_randoms, n_quantiles, filter_radius = 'lattice', None, 5, 10 # run for other hyperparameter combinations in order to generate all subsequent plots!
     data_folder = f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/fisher_convergence/power/{query_type}_{n_randoms}_{n_quantiles}_{filter_radius}'
     nderiv_list = np.arange(10, 510, 10)
     ncov_list = np.arange(2100, 15300, 300)
     ncov_max, nderiv_max = 15000, 500
     # Left side of plot are the covariance constraints while right hand side are derivative convergence
-    fig, ax = plt.subplots(3, 2, dpi=400, figsize=(8,8))
+    fig, ax = plt.subplots(3, 2, dpi=500, figsize=(8,8))
     fig.subplots_adjust(hspace=0.15, wspace=0.25, left=0.09, right=0.97, top=0.96, bottom=0.07)
-    # Iterates through each function combination
     param_list = ['LC', 'EQ', 'OR_LSS', 'Mmin', 'h', 'ns', 'Om', 's8']
-    param_list_labels = [r'$f_{NL}^{loc}$', r'$f_{NL}^{equil}$', r'$f_{NL}^{ortho}$', r'$M_{min}$', r'$h$', r'$n_s$', r'$\Omega_m$', r'$\sigma_8$']
+    param_list_labels = [r'$f_{\mathrm{NL}}^{\mathrm{loc}}$', r'$f_{\mathrm{NL}}^{\mathrm{equil}}$', r'$f_{\mathrm{NL}}^{\mathrm{ortho}}$', r'$M_{\mathrm{min}}$', r'$h$', r'$n_{\mathrm{s}}$', r'$\Omega_{\mathrm{m}}$', r'$\sigma_8$']
     param_colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray']
     combs = ['Halo', 'DS', 'Joint']
     # Initiates arrays to save to file for the raw and corrected constraints for each parameter and function combination
@@ -56,14 +55,14 @@ if __name__ == '__main__':
     ax[1][0].set_xticks([])
     ax[0][1].set_xticks([])
     ax[1][1].set_xticks([])
-    ax[2][0].set_xlabel(r'$N_{cov}$')
-    ax[2][1].set_xlabel(r'$N_{deriv}$')
-    ax[0][0].set_ylabel(r'$\sigma(N_{cov})/\sigma(N_{cov}=15000)$')
-    ax[1][0].set_ylabel(r'$\sigma(N_{cov})/\sigma(N_{cov}=15000)$')
-    ax[2][0].set_ylabel(r'$\sigma(N_{cov})/\sigma(N_{cov}=15000)$')
-    ax[0][1].set_ylabel(r'$\sigma(N_{deriv})/\sigma(N_{deriv}=500)$')
-    ax[1][1].set_ylabel(r'$\sigma(N_{deriv})/\sigma(N_{deriv}=500)$')
-    ax[2][1].set_ylabel(r'$\sigma(N_{deriv})/\sigma(N_{deriv}=500)$')
+    ax[2][0].set_xlabel(r'$N_{\mathrm{cov}}$')
+    ax[2][1].set_xlabel(r'$N_{\mathrm{deriv}}$')
+    ax[0][0].set_ylabel(r'$\sigma(N_{\mathrm{cov}})/\sigma(N_{\mathrm{cov}}=15000)$')
+    ax[1][0].set_ylabel(r'$\sigma(N_{\mathrm{cov}})/\sigma(N_{\mathrm{cov}}=15000)$')
+    ax[2][0].set_ylabel(r'$\sigma(N_{\mathrm{cov}})/\sigma(N_{\mathrm{cov}}=15000)$')
+    ax[0][1].set_ylabel(r'$\sigma(N_{\mathrm{deriv}})/\sigma(N_{\mathrm{deriv}}=500)$')
+    ax[1][1].set_ylabel(r'$\sigma(N_{\mathrm{deriv}})/\sigma(N_{\mathrm{deriv}}=500)$')
+    ax[2][1].set_ylabel(r'$\sigma(N_{\mathrm{deriv}})/\sigma(N_{\mathrm{deriv}}=500)$')
     ax[0][1].axhline(y=1, linestyle='--', linewidth=0.5, color='grey')
     ax[1][1].axhline(y=1, linestyle='--', linewidth=0.5, color='grey')
     ax[2][1].axhline(y=1, linestyle='--', linewidth=0.5, color='grey')
@@ -82,4 +81,4 @@ if __name__ == '__main__':
     ax[2][1].set_ylim(0, 1.05)
     np.save(f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/constraints_raw_{query_type}_{n_randoms}_{n_quantiles}_{filter_radius}_including_all_auto.npy', raw_constraints)
     np.save(f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/constraints_corrected_{query_type}_{n_randoms}_{n_quantiles}_{filter_radius}_including_all_auto.npy', corrected_constraints) 
-    fig.savefig(f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/covariance_derivative_convergence_{query_type}_{n_randoms}_{n_quantiles}_{filter_radius}_including_all_auto.png')
+    fig.savefig(f'/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results/covariance_derivative_convergence_{query_type}_{n_randoms}_{n_quantiles}_{filter_radius}_including_all_auto.pdf')
