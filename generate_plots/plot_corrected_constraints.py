@@ -19,16 +19,13 @@ if __name__ == '__main__':
     corrected_lattice_7_10 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_7_10_including_all_auto.npy'))
     corrected_lattice_5_7 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_5_7_including_all_auto.npy'))
     corrected_lattice_5_13 = np.load(os.path.join(data_folder, 'constraints_corrected_lattice_None_5_13_including_all_auto.npy'))
-
     # Makes a plot of the relative (corrected and raw) improvement between the joint halo/DSC power spectra vs halo 
     # power spectrum for each of the parameters
-    
-    x_tick_labels = [r'$f_{NL}^{loc}$', r'$f_{NL}^{equil}$', r'$f_{NL}^{ortho}$', r'$M_{min}$', r'$h$', r'$n_s$', r'$\Omega_m$', r'$\sigma_8$']
-
-    fig, ax = plt.subplots(dpi=400)
+    x_tick_labels = [r'$f_{\mathrm{NL}}^{\mathrm{loc}}$', r'$f_{\mathrm{NL}}^{\mathrm{equil}}$', r'$f_{\mathrm{NL}}^{\mathrm{ortho}}$', r'$M_{\mathrm{min}}$', r'$h$', r'$n_{\mathrm{s}}$', r'$\Omega_{\mathrm{m}}$', r'$\sigma_8$']
+    fig, ax = plt.subplots(dpi=500)
     markersize=5
-    comb_colors = ['tab:blue', 'tab:green']
-    comb_labels = [r'$\sigma_{Halo}/\sigma_{DSC}$', r'$\sigma_{Halo}/\sigma_{Joint}$']
+    comb_colors = ['tab:blue', 'tab:red']
+    comb_labels = [r'$\sigma_{\mathrm{Halo}}/\sigma_{\mathrm{DSC}}$', r'$\sigma_{\mathrm{Halo}}/\sigma_{\mathrm{Joint}}$']
     for i in range(1,3): # three function combinations
         x_vals = np.arange(8)
         # normalizes constraints to the halo power spectrum constraints
@@ -39,7 +36,7 @@ if __name__ == '__main__':
     print('(Raw) relative improvements:', list(np.round(raw_lattice_5_10[:, 0]/raw_lattice_5_10[:, 2], 6)))
     print('(Corrected) relative improvements:', list(np.round(corrected_lattice_5_10[:, 0]/corrected_lattice_5_10[:, 2], 6)))
     for i in range(1, 3):
-        ax.plot(np.array(x_vals)-0.1, raw_lattice_5_10[:, 0]/raw_lattice_5_10[:, i], 'X', 
+        ax.plot(np.array(x_vals)-0.1, raw_lattice_5_10[:, 0]/raw_lattice_5_10[:, i], 'x', 
                    color=comb_colors[i-1], label=comb_labels[i-1]+' (raw)', markersize=markersize)
     ax.set_yscale('log')
     ax.set_yticks([0.5, 1,2,3,4,5,6,7,8,9,10])
@@ -53,19 +50,18 @@ if __name__ == '__main__':
     ax.set_xticks([0,1,2,3,4,5,6,7])
     ax.set_xticklabels(x_tick_labels)
     ax.legend(loc=1)
-    fig.savefig(os.path.join(data_folder, 'raw_corrected_relative_improvement_constraints_including_all_auto.png'))
-
+    fig.savefig(os.path.join(data_folder, 'raw_corrected_relative_improvement_constraints_including_all_auto.pdf'))
     # Makes a plot of the relative improvement (corrected) between the joint halo/DSC power spectra vs halo
     # power spectrum for each the parameters, depending on the hyperparameter choice
-
-    fig2, ax2 = plt.subplots(dpi=400)
+    fig2, ax2 = plt.subplots(dpi=500)
     x_vals = np.arange(8)
-    ax2.plot(np.array(x_vals), corrected_lattice_3_10[:, 0]/corrected_lattice_3_10[:, 2], '^', label='Lattice, ' + r'$N_{quantile}=$' + '3, ' + r'$R_s=$' + '10', markersize=markersize, color='tab:blue')
-    ax2.plot(np.array(x_vals), corrected_lattice_7_10[:, 0]/corrected_lattice_7_10[:, 2], '^', label='Lattice, ' + r'$N_{quantile}=$' + '7, ' + r'$R_s=$' + '10', markersize=markersize, color='tab:orange')
-    ax2.plot(np.array(x_vals), corrected_lattice_5_7[:, 0]/corrected_lattice_5_7[:, 2], '^', label='Lattice, ' + r'$N_{quantile}=$' + '5, ' + r'$R_s=$' + '7', markersize=markersize, color='tab:green')
-    ax2.plot(np.array(x_vals), corrected_lattice_5_13[:, 0]/corrected_lattice_5_13[:, 2], '^', label='Lattice, ' + r'$N_{quantile}=$' + '5, ' + r'$R_s=$' + '13', markersize=markersize, color='tab:red')
-    ax2.plot(np.array(x_vals), corrected_random_5_10[:, 0]/corrected_random_5_10[:, 2], '^', label='Random, ' + r'$N_{quantile}=$' + '5, ' + r'$R_s=$' + '10', markersize=markersize, color='tab:purple')
-    ax2.plot(np.array(x_vals), corrected_lattice_5_10[:, 0]/corrected_lattice_5_10[:, 2], '+', label='Lattice, ' + r'$N_{quantile}=$' + '5, ' + r'$R_s=$' + '10', markersize=1.5*markersize, color='black')
+    markersize=5
+    ax2.plot(np.array(x_vals), corrected_lattice_3_10[:, 0]/corrected_lattice_3_10[:, 2], 'v', label='Lattice, ' + r'$N_{\mathrm{quantile}}=$' + '3, ' + r'$R_{\mathrm{s}}=$' + '10', markersize=markersize, color='tab:blue')
+    ax2.plot(np.array(x_vals), corrected_lattice_7_10[:, 0]/corrected_lattice_7_10[:, 2], '^', label='Lattice, ' + r'$N_{\mathrm{quantile}}=$' + '7, ' + r'$R_{\mathrm{s}}=$' + '10', markersize=markersize, color='tab:blue')
+    ax2.plot(np.array(x_vals), corrected_lattice_5_7[:, 0]/corrected_lattice_5_7[:, 2], 'v', label='Lattice, ' + r'$N_{\mathrm{quantile}}=$' + '5, ' + r'$R_{\mathrm{s}}=$' + '7', markersize=markersize, color='tab:red')
+    ax2.plot(np.array(x_vals), corrected_lattice_5_13[:, 0]/corrected_lattice_5_13[:, 2], '^', label='Lattice, ' + r'$N_{\mathrm{quantile}}=$' + '5, ' + r'$R_{\mathrm{s}}=$' + '13', markersize=markersize, color='tab:red')
+    ax2.plot(np.array(x_vals), corrected_random_5_10[:, 0]/corrected_random_5_10[:, 2], 'x', label='Random, ' + r'$N_{\mathrm{quantile}}=$' + '5, ' + r'$R_{\mathrm{s}}=$' + '10', markersize=markersize, color='black')
+    ax2.plot(np.array(x_vals), corrected_lattice_5_10[:, 0]/corrected_lattice_5_10[:, 2], '+', label='Lattice, ' + r'$N_{\mathrm{quantile}}=$' + '5, ' + r'$R_{\mathrm{s}}=$' + '10', markersize=markersize*1.5, color='black')
     ax2.legend(loc=1)
     ax2.set_ylim(1, 10.01)
     ax2.set_yscale('log')
@@ -80,4 +76,4 @@ if __name__ == '__main__':
     ax2.set_yticks([1,2,3,4,5,6,7,8,9,10])
     ax2.set_yticklabels([1,2,3,4,5,6,7,8,9,10])
     ax2.set_ylabel(comb_labels[1])
-    fig2.savefig(os.path.join(data_folder, 'relative_improvement_hyperparameters_including_all_auto.png'))
+    fig2.savefig(os.path.join(data_folder, 'relative_improvement_hyperparameters_including_all_auto.pdf'))
