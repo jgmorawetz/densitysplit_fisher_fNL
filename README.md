@@ -14,5 +14,5 @@ This repository contains all the codes necessary to reproduce the results in the
    - Run 'plot_fiducial_power_spectra.py' to generate figure 2.
    - Run 'plot_constraints_max_wavenumber.py' to generate figure 3.
    - Run 'plot_contours.py' to generate figure 4.
-   - Run 'plot_derivative_covariance_convergence.py' to generate figure 5.
+   - Run 'plot_derivative_covariance_convergence.py' to generate figure 5 (and repeat for the different hyperparameter combinations other than the baseline for results in remaining plots).
    - Run 'plot_corrected_constraints.py' to generate figures 6 and 7.
