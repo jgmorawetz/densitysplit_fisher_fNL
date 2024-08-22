@@ -1,16 +1,15 @@
 import os
 import time
 import readfof
-import numpy as np
+import numpy as np; np.random.seed(0)
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from astropy.table import Table
 from densitysplit.pipeline import DensitySplit
 
 
-def get_halo_positions(halo_path, boxsize, snapnum, redshift, omega_m, min_mass, 
-                       space, los):
-    """Retrieves halo positions in real or redshift space.
+def get_halo_info(halo_path, boxsize, snapnum, redshift, omega_m, min_mass, space, los):
+    """Retrieves halo positions and masses in real or redshift space.
 
     Args:
         halo_path (str): The folder path of the snapshot.
@@ -43,9 +42,10 @@ def get_halo_positions(halo_path, boxsize, snapnum, redshift, omega_m, min_mass,
     mass_cut = mass >= min_mass
     pos = pos[mass_cut]
     vel = vel[mass_cut]
+    mass = mass[mass_cut]
     # Applies redshift space distortions if needed
     if space == 'r':
-        return pos
+        return pos, mass
     elif space == 'z':
         if los == 'x':
             los_vec = np.array([1, 0, 0])
@@ -56,7 +56,7 @@ def get_halo_positions(halo_path, boxsize, snapnum, redshift, omega_m, min_mass,
         pos = pos + (vel*los_vec)/(az*Hz)
         # Enforces periodic boundary conditions
         pos = pos % boxsize
-        return pos
+        return pos, mass
 
 
 if __name__ == '__main__':
@@ -65,29 +65,22 @@ if __name__ == '__main__':
     phase = 0
     boxsize = 1000
     nmesh = 512
-    # Same resolution for obtaining quantiles as for power spectrum
     cellsize_ds = boxsize/nmesh
-    # Uses finer resolution for purposes of plotting
-    cellsize_lattice = cellsize_ds/2
-    # Parameters for the halos at redshift 0 for fiducial cosmology
+    cellsize_lattice = boxsize/nmesh/2
     snapnum = 4
     redshift = 0
     omega_m = 0.3175
     min_mass = 3.2e13
-    # Hyperparameters
     filter_type = 'Gaussian'
-    # Converts to effective TopHat radius
     filter_radius = 10
-    filter_radius_eff = filter_radius*np.sqrt(5)
+    filter_radius_eff = filter_radius*np.sqrt(5) # converts to effective TopHat radius
     n_quantiles = 5
-    # Folder paths to read from and save results
     halo_folder = '/home/jgmorawe/scratch/quijote/fiducial'
     plot_folder = '/home/jgmorawe/projects/rrg-wperciva/jgmorawe/results/quijote/plot_results'
     halo_path = os.path.join(halo_folder, f'{phase}')
-    # Redshift-space halo positions
     space = 'z'
     los = 'z'
-    halo_positions = get_halo_positions(
+    halo_positions, halo_masses = get_halo_info(
         halo_path, boxsize, snapnum, redshift, omega_m, min_mass, space, los)
     halo_positions_x = halo_positions[:, 0]
     halo_positions_y = halo_positions[:, 1]
@@ -98,7 +91,6 @@ if __name__ == '__main__':
                                           (halo_positions_y >= 0) & (halo_positions_y <= 500) &
                                           (halo_positions_z >= 500-filter_radius_eff) &
                                           (halo_positions_z <= 500+filter_radius_eff)]
-    # Creates meshgrid with all the 2d points to sample at
     edges = np.arange(0, boxsize+cellsize_lattice, cellsize_lattice)
     centres = 1/2*(edges[:-1]+edges[1:])
     x_cells, y_cells = np.meshgrid(centres, centres)
@@ -106,8 +98,7 @@ if __name__ == '__main__':
     y_cells = y_cells.flatten()
     z_cells = 500*np.ones(len(x_cells)) # sets z=500 (middle of box) for X-Y cross section
     query_positions = np.vstack((x_cells, y_cells, z_cells)).T
-    ds_object = DensitySplit(data_positions=halo_positions, boxsize=boxsize)
-    # Obtains overdensity at each of the query positions
+    ds_object = DensitySplit(data_positions=halo_positions, boxsize=boxsize, data_weights=None)
     density = ds_object.get_density_mesh(smooth_radius=filter_radius, cellsize=cellsize_ds,
                                          sampling_positions=query_positions, filter_shape=filter_type)
     # Finds quantiles associated with the density values with which to split into groups
@@ -127,7 +118,6 @@ if __name__ == '__main__':
     overdensity_label = np.flip(overdensity_label, axis=0) # flips so x runs left to right, y bottom to top
     density = density[0:dim//2, 0:dim//2]
     density = np.flip(density, axis=0)
-    # Makes plot
     fig, ax = plt.subplots(1, 2, sharex=True, sharey=True, dpi=400, figsize=(7, 3.5))
     fig.subplots_adjust(wspace=0.075, left=0.09, right=0.97, top=0.97, bottom=0.13)
     ax[0].set_aspect('equal')
