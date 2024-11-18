@@ -137,7 +137,7 @@ def soln(arr1, arr2):
 
 
 if __name__ == '__main__':
-
+    
     # splits up into array jobs with several phases for each
     parser = argparse.ArgumentParser()
     parser.add_argument("--start_idx", type=int)
@@ -336,10 +336,10 @@ if __name__ == '__main__':
     """
     # obtains the dln(n)/dln(sigma8) predictions from the code 'test_matter_field_indirectly.py'
     fixed = False
-    dlnn_dlnsigma8_nosmooth_matter = [2.24940221, -0.11110986, -0.76148008, -0.95784285, -0.41674286]
-    dlnn_dlnsigma8_smooth10_matter = [1.62286659, -0.44305718, -0.89965544, -0.82278199, 0.54402084]
-    dlnn_dlnsigma8_smooth10_notweighted_halo = [-0.58322923, 0.04753868, 0.27895424, 0.37382723, -0.11690663]
-    dlnn_dlnsigma8_smooth10_weighted_halo = [-0.15674471, 0.0840107, 0.08664489, 0.04099359, -0.05490029]
+    dlnn_dlnsigma8_nosmooth_matter = np.array([2.24940221, -0.11110986, -0.76148008, -0.95784285, -0.41674286])
+    dlnn_dlnsigma8_smooth10_matter = np.array([1.62286659, -0.44305718, -0.89965544, -0.82278199, 0.54402084])
+    dlnn_dlnsigma8_smooth10_notweighted_halo = np.array([-0.58322923, 0.04753868, 0.27895424, 0.37382723, -0.11690663])
+    dlnn_dlnsigma8_smooth10_weighted_halo = np.array([-0.15674471, 0.0840107, 0.08664489, 0.04099359, -0.05490029])
 
     # plots the responses (and overlays predicted responses for each of the four scenarios)
     fig,ax=plt.subplots(2, 2, sharex=True, sharey=False, dpi=500, figsize=(8,7))
@@ -366,6 +366,9 @@ if __name__ == '__main__':
         linear_biases = [] # appends all the linear biases (as measured by mean ratio on large scales k <= 0.03 h/Mpc)
         for i in range(5):
             linear_biases.append(np.mean(np.mean(data_fiducial['Quantile-Matter'][i][:, k_cut2], axis=0)/np.mean(data_fiducial['Matter'][:, k_cut2], axis=0)))
+            if title in ['smooth10_weighted_halo', 'smooth10_notweighted_halo']: # skips DS3 for the bottom two panels since it is too noisy to properly visualize
+                if i == 2:
+                    continue
             ax[ax_ind[0]][ax_ind[1]].plot(k, soln(np.mean(data_LC_p['Quantile-Matter'][i][:, k_cut], axis=0)/np.mean(data_fiducial['Quantile-Matter'][i][:, k_cut], axis=0),
                                                   np.mean(data_LC_m['Quantile-Matter'][i][:, k_cut], axis=0)/np.mean(data_fiducial['Quantile-Matter'][i][:, k_cut], axis=0)), 
                                                   '-', color=colors[i], linewidth=0.7, label=f'Q{i+1}')
@@ -373,6 +376,9 @@ if __name__ == '__main__':
         print(title, ratios)
         for i in range(5): # plots the DS1 quantile rescaled according to the relative values of bphi/b for the remaining quantiles
             if i != 0:
+                if title in ['smooth10_weighted_halo', 'smooth10_notweighted_halo']:
+                    if i == 2:
+                        continue
                 ax[ax_ind[0]][ax_ind[1]].plot(k, ratios[i]/ratios[0]*soln(np.mean(data_LC_p['Quantile-Matter'][0][:, k_cut], axis=0)/np.mean(data_fiducial['Quantile-Matter'][0][:, k_cut], axis=0),
                                                                           np.mean(data_LC_m['Quantile-Matter'][0][:, k_cut], axis=0)/np.mean(data_fiducial['Quantile-Matter'][0][:, k_cut], axis=0)), 
                                                                           '--', color=colors[i], linewidth=1)
