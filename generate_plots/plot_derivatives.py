@@ -106,7 +106,7 @@ if __name__ == '__main__':
         f'power_Mmin_3.3e13_{filter_type}_{filter_radius}_{n_quantiles}_{nmesh}_{query_type}_{n_randoms}_{redshift}_33000000000000.0_{split}_{resampler}_{interlacing}_{compensate}_{rebin_factor}kF.npy'), param_names))
     colors = ['mediumblue', 'cornflowerblue', 'grey', 'lightsalmon', 'firebrick']
     # Generates figure with the derivatives
-    fig, ax = plt.subplots(len(param_names)//2, 2, sharex=True, sharey=False, figsize=(7,9), dpi=400)
+    fig, ax = plt.subplots(len(param_names)//2, 2, sharex=True, sharey=False, figsize=(1.12*7,1.12*9), dpi=400)
     # Iterates through each parameter and plots results for each
     ax_indices = [(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (1, 1), (2, 1), (3, 1)]
     for i in range(len(param_names)):
@@ -119,15 +119,15 @@ if __name__ == '__main__':
         derivative_halo = derivative_per_noise(low_realizations, high_realizations, fiducial_realizations, n_realizations, f'h-h(0)', k_cut, param_diffs[i])
         ax[ax_indices[i][0]][ax_indices[i][1]].plot(k_plot, derivative_halo, '-', color='black', label=f'Halo', linewidth=1)
         ax[ax_indices[i][0]][ax_indices[i][1]].ticklabel_format(scilimits=(0,0), axis='y')
-        ax[ax_indices[i][0]][ax_indices[i][1]].set_title(param_labels[i])
-    ax[0][0].legend(loc=1)
-    ax[-1][0].set_xlabel(r'$k \ [h^{-1}\rm{Mpc}]$')
-    ax[-1][1].set_xlabel(r'$k \ [h^{-1}\rm{Mpc}]$')
-    ax[0][0].set_ylabel(r'$\partial P / \partial \theta / \sigma_P$')
-    ax[1][0].set_ylabel(r'$\partial P / \partial \theta / \sigma_P$')
-    ax[2][0].set_ylabel(r'$\partial P / \partial \theta / \sigma_P$')
-    ax[3][0].set_ylabel(r'$\partial P / \partial \theta / \sigma_P$')
+        ax[ax_indices[i][0]][ax_indices[i][1]].set_title(param_labels[i], fontsize=13)
+    ax[0][0].legend(loc=1, ncol=3)
+    ax[-1][0].set_xlabel(r'$k \ [h^{-1}\rm{Mpc}]$', fontsize=13)
+    ax[-1][1].set_xlabel(r'$k \ [h^{-1}\rm{Mpc}]$', fontsize=13)
+    ax[0][0].set_ylabel(r'$(\partial P / \partial \theta)/ \sigma_P$', fontsize=13)
+    ax[1][0].set_ylabel(r'$(\partial P / \partial \theta)/ \sigma_P$', fontsize=13)
+    ax[2][0].set_ylabel(r'$(\partial P / \partial \theta)/ \sigma_P$', fontsize=13)
+    ax[3][0].set_ylabel(r'$(\partial P / \partial \theta)/ \sigma_P$', fontsize=13)
     ax[0][0].set_xscale('log')
-    fig.suptitle('Quantile Cross Monopole')
-    fig.subplots_adjust(bottom=0.07, top=0.92, left=0.08, right=0.98, hspace=0.23, wspace=0.16)
+    #fig.suptitle('Quantile Cross Monopole')
+    fig.subplots_adjust(bottom=0.06, top=0.96, left=0.09, right=0.98, hspace=0.2, wspace=0.16)
     fig.savefig(os.path.join(save_path, 'cross_derivatives.pdf'))
